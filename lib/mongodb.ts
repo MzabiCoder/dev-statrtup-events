@@ -24,6 +24,13 @@ declare global {
 const cache: MongooseCache = global.mongooseCache ?? { conn: null, promise: null };
 global.mongooseCache = cache;
 
+/**
+ * Connects to MongoDB using MONGODB_URI, reusing a cached connection or an
+ * in-flight connection attempt. Failed attempts are cleared to allow retries.
+ *
+ * @returns The connected Mongoose instance.
+ * @throws The connection error if the attempt fails.
+ */
 export async function connectToDatabase(): Promise<typeof mongoose> {
   // Return the existing connection if already established
   if (cache.conn) return cache.conn;
