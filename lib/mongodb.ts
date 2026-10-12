@@ -35,6 +35,13 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
     });
   }
 
-  cache.conn = await cache.promise;
+  const connectionPromise = cache.promise;
+  try {
+    cache.conn = await connectionPromise;
+  } catch (error) {
+    // A failed waiter must not clear a newer connection attempt.
+    if (cache.promise === connectionPromise) cache.promise = null;
+    throw error;
+  }
   return cache.conn;
 }

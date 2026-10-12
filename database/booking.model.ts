@@ -1,4 +1,5 @@
 import mongoose, { Schema, type Document, type Model, type Types } from "mongoose";
+import Event from "./event.model";
 
 export interface IBooking extends Document {
   eventId: Types.ObjectId;
@@ -34,7 +35,7 @@ BookingSchema.pre("save", async function () {
   }
 
   // Ensure the referenced Event exists; reject the booking if it does not
-  const eventExists = await mongoose.models.Event.exists({ _id: this.eventId });
+  const eventExists = await Event.exists({ _id: this.eventId });
   if (!eventExists) {
     throw new Error(`Event not found for id: "${this.eventId.toString()}"`);
   }

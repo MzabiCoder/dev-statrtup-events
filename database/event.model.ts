@@ -53,12 +53,14 @@ const EventSchema = new Schema<IEvent>(
 EventSchema.pre("save", function () {
   // Regenerate slug only when title is new or has changed
   if (this.isModified("title")) {
-    this.slug = this.title
+    const normalizedTitle = this.title
       .toLowerCase()
       .trim()
       .replace(/[^a-z0-9\s-]/g, "")  // strip non-alphanumeric chars
       .replace(/\s+/g, "-")           // collapse whitespace to hyphens
       .replace(/-+/g, "-");           // collapse consecutive hyphens
+    // The document ID keeps repeated titles unique, including concurrent saves.
+    this.slug = `${normalizedTitle || "event"}-${this._id}`;
   }
 
   // Normalise date: accept any parseable string, store as YYYY-MM-DD
